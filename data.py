@@ -190,10 +190,7 @@ class Data():
         ventas_por_fabricante_y_anio = ventas_por_fabricante_y_anio.dropna()
         ventas_por_fabricante_y = ventas_por_fabricante_y_anio[['Company', 'Tasa_Crecimiento']]
         ventas_por_fabricante_y.set_index('Company', inplace=True)
-        # Display the data
-        print(ventas_por_fabricante_y)
         company_names = ventas_por_fabricante_y.index
-        print(company_names)
         # Call the repetition function to handle common logic
         self.repetition(ventas_por_fabricante_y, company_names, "growing_companies_graphics")
 

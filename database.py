@@ -2,6 +2,7 @@ import mysql.connector
 import pandas as pd
 
 
+
 database = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
@@ -10,6 +11,36 @@ database = mysql.connector.connect(
 )
 
 cursor = database.cursor(dictionary=True)
+
+
+def save_infor_db():
+    car_data = pd.read_csv('data/car_data.csv')
+    car_data.fillna(0, inplace=True)
+    database.commit()
+    insert_query = """INSERT INTO car_sales (car_id, date, customer_Name, gender, annual_Income, dealer_Name, company,  model, engine,  transmission, color,  price, dealer_No, body_Style, phone, dealer_Region) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    for index, row in car_data.iterrows():
+        cursor.execute(insert_query, (
+            row['Car_id'],
+            row['Date'],
+            row['Customer Name'],
+            row['Gender'],
+            row['Annual Income'],
+            row['Dealer_Name'],
+            row['Company'],
+            row['Model'],
+            row['Engine'],
+            row['Transmission'],
+            row['Color'],
+            row['Price'],
+            row['Dealer_No '],
+            row['Body Style'],
+            row['Phone'],
+            row['Dealer_Region']
+        ))
+    database.commit()
+    database.close()
 
 
 def login_query(username, password):

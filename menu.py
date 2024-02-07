@@ -24,16 +24,18 @@ class Menu:
     def user_menu(self):
         # Method to display the user menu after successful login
         a = Data()  # Create a Data object
-        answer = input("     USER MENU      \n"
+        run = True
+        while run:
+          answer = input("     USER MENU      \n"
                        "1. Sales by days \n"
                        "2. Top 5 stores that sold the most cars \n"
                        "3. Top 10 company with the most revenue \n"
                        "4. Number of cars sold per month\n"
                        "5. Top 10 best selling cars\n"
                        "6. Fastest growing companies\n"
-                       "7. \n"
+                       "7. q\n"
                        "Enter your choice: ")  # Prompt user for menu choice
-        if answer.isdigit():
+          if answer.isdigit():
             answer = int(answer)
             # Check user input and execute corresponding action
             match answer:
@@ -49,7 +51,9 @@ class Menu:
                     a.top_10_car()# Show top 10 companies with the most revenue
                 case 6:
                     a.growing_companies()  # Show top 10 companies with the most revenue
-        else:
+                case 7:
+                    run = False
+          else:
             print(f" { answer } is not a number ")  # Print message for invalid menu choice
 
     def show_customers(self):

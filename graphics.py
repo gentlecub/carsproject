@@ -118,22 +118,35 @@ class Graphics:
             data (DataFrame): DataFrame containing the market share distribution with columns 'Dealer_Name' and 'Count'.
             companies (str): Label for the companies.
         """
-        # First plot: pie chart
-        labels = data['Dealer_Name']
-        values = data['Count']
-        letra_str = str(values)
-        mi_serie_limpiada = pd.Series(letra_str).str.extract('(\d+\.\d+)')
-        index_df = mi_serie_limpiada.reset_index()
-        values_float = index_df.iloc[0].astype(float)
-        serie_sin_cero = values_float[0]
-        sizes = [serie_sin_cero]
-        label = labels.iloc[0]
-        label = label.split()
-        # Second plot: bar chart
-        plt.subplot(1, 2, 2)
-        plt.bar(label, sizes)  # Provide data for bar chart
-        plt.title('Market Share Distribution by Manufacturer')
-        plt.xlabel('Manufacturer')
-        plt.ylabel('Count')
-        # Show the plots
-        plt.show()  # Display the plots
+        if len(data.index) > 1:
+            label = data['Tasa_Crecimiento']
+            name = data.index
+            plt.figure(figsize=(10, 6))
+            plt.bar(name,label)  # Provide data for bar chart
+            plt.title('Market Share Distribution by Manufacturer')
+            plt.xlabel('Company')
+            plt.ylabel('Count')
+            plt.xticks(rotation=45, ha='right')  # Rotar y alinear las etiquetas del eje x
+            plt.tight_layout()
+            # Show the plots
+            plt.show()  # Display the pl
+        else:
+         # First plot: pie chart
+         labels = data['Dealer_Name']
+         values = data['Count']
+         letra_str = str(values)
+         mi_serie_limpiada = pd.Series(letra_str).str.extract('(\d+\.\d+)')
+         index_df = mi_serie_limpiada.reset_index()
+         values_float = index_df.iloc[0].astype(float)
+         serie_sin_cero = values_float[0]
+         sizes = [serie_sin_cero]
+         label = labels.iloc[0]
+         label = label.split()
+         # Second plot: bar chart
+         plt.subplot(1, 2, 2)
+         plt.bar(label, sizes)  # Provide data for bar chart
+         plt.title('Market Share Distribution by Manufacturer')
+         plt.xlabel('Manufacturer')
+         plt.ylabel('Count')
+         # Show the plots
+         plt.show()  # Display the plots
