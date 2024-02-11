@@ -23,7 +23,7 @@ class Menu:
 
     def user_menu(self):
         # Method to display the user menu after successful login
-        a = Data()  # Create a Data object
+        information = Data()  # Create a Data object
         run = True
         while run:
           answer = input("     USER MENU      \n"
@@ -33,25 +33,31 @@ class Menu:
                        "4. Number of cars sold per month\n"
                        "5. Top 10 best selling cars\n"
                        "6. Fastest growing companies\n"
-                       "7. q\n"
+                       "7. Model preference by gender\n" 
+                       "8. Transmission Type\n" 
+                       "9. q\n"
                        "Enter your choice: ")  # Prompt user for menu choice
           if answer.isdigit():
             answer = int(answer)
             # Check user input and execute corresponding action
             match answer:
                 case 1:
-                    a.sales_x_day()  # Show sales by days
+                    information.sales_x_day()  # Show sales by days
                 case 2:
-                    a.store_top5()  # Show top 5 stores that sold the most cars
+                    information.store_top5()  # Show top 5 stores that sold the most cars
                 case 3:
-                    a.top_10_company()  # Show top 10 companies with the most revenue
+                    information.top_10_company()  # Show top 10 companies with the most revenue
                 case 4:
-                    a.cars_sold_per_month() # Show top 10 companies with the most revenue
+                    information.cars_sold_per_month() # Show top 10 companies with the most revenue
                 case 5:
-                    a.top_10_car()# Show top 10 companies with the most revenue
+                    information.top_10_car()# Show top 10 companies with the most revenue
                 case 6:
-                    a.growing_companies()  # Show top 10 companies with the most revenue
+                    information.growing_companies()  # Show top 10 companies with the most revenue
                 case 7:
+                    information.prferencia_modelo()
+                case 8:
+                    information.transmission_type()
+                case 9:
                     run = False
           else:
             print(f" { answer } is not a number ")  # Print message for invalid menu choice

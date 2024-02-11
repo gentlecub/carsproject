@@ -1,6 +1,6 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 from graphics import Graphics
+import re
 
 class Data():
     """
@@ -35,18 +35,22 @@ class Data():
         # Convert the 'Date' column to datetime type
         df['Date'] = pd.to_datetime(df['Date'])
         # Get the unique years present in the DataFrame
-        years_unique = df['Date'].dt.year.unique()
+        result = df.groupby('Date')['Price'].sum()
+        result = result.reset_index()
+        #years_unique = df['Date'].dt.year.unique()
         # Iterate over the unique years and display them to the user
-        print("Select the year:")
-        for index, year in enumerate(years_unique, start=1):
-            print(f"{index}: {year}")
+        print("Total sales over time ")
+        for index, date in enumerate(result['Date'], start=1):
+            if isinstance(date, pd.Timestamp):  # Verificar si es un objeto datetime
+                print(f"{index}: {date.date()}")
         # Prompt the user to choose a specific year or all years
-        answer = input("3: all years\n")
+        print(f"{len(result) + 1}: Select all menu items")
+        answer = input("Select one of the options: \n")
         if answer.isdigit():
             answer = int(answer)
             # If a specific year is chosen
-            if answer == 1 or answer == 2:
-                filtered_data = df[df['Date'].dt.year == years_unique[answer -1]]
+            if answer > 0 and answer <= (len(result)):
+                filtered_data = result.iloc[answer - 1]
                 confirmation = self.print_graph()
                 if confirmation.isdigit():
                     confirmation = int(confirmation)
@@ -54,13 +58,16 @@ class Data():
                         graphics = Graphics()
                         graphics.sales_x_day_graphics(filtered_data)
                     elif confirmation == 2:
-                        filtered_data = filtered_data[['Date', 'Price']]
-                        print(filtered_data)
+                        if isinstance(filtered_data['Date'], pd.Timestamp):
+                            date = filtered_data['Date'].date()
+                            price = filtered_data['Price']
+                            print(f"Date: {date}  Total Sales: {price}")
+
                 else:
                     print("It can't be a letter")
             # If all years are chosen
-            elif answer == 3:
-                time_series_data = df.groupby('Date').agg({'Price': 'sum'}).reset_index()
+            elif answer == len(result) +1:
+                time_series_data = result
                 confirmation = self.print_graph()
                 if confirmation.isdigit():
                     confirmation = int(confirmation)
@@ -68,15 +75,15 @@ class Data():
                         graphics = Graphics()
                         graphics.sales_x_day_graphics(time_series_data)
                     elif confirmation == 2:
-                        time_series_data = df.groupby('Date').agg({'Price': 'sum'}).reset_index()
-                        time_series_data = time_series_data[['Date', 'Price']]
-                        print(time_series_data)
+                        time_series_data = result.to_string(header=False, index=False)
+                        resultados = re.findall(r"(\d{4}-\d{2}-\d{2})\s+(\d+)", time_series_data)
+                        for date,item in resultados:
+                           print(f"Date:{date} Total Sales:{item}")
                 else:
-                    print("It can't be a letter")
+                    print("Enter a valid number")
         else:
             print("Enter a valid number")
-
-    def store_top5(self):
+    def store_top5_dealer(self):
         """
         Method to select and display the top 5 stores based on car sales.
         """
@@ -86,11 +93,11 @@ class Data():
         compani_top5 = df["Dealer_Name"].value_counts()[:5]
         compani = compani_top5.index
         # Display the top 5 stores to the user
-        print("Select the store:")
+        print("The dealer more cars have been sold in 2022-2023:")
         for index, name in enumerate(compani_top5.index, start=1):
             print(f"{index}: {name}")
         # Prompt the user to choose a store or all stores
-        answer = input(f"{len(compani_top5) + 1}: all the stores\n")
+        answer = input(f"{len(compani_top5) + 1}: Select all menu items\n")
         if answer.isdigit():
             answer = int(answer)
             # If a specific store is chosen
@@ -107,6 +114,7 @@ class Data():
                         graphics = Graphics()
                         graphics.store_top5_graphics(selected_df, data_name)
                     elif confirmation == 2:
+                        selected_df = selected_df.to_string(header=False, index=False)
                         print(selected_df)
                 else:
                     print("It can't be a letter")
@@ -119,6 +127,7 @@ class Data():
                         graphics = Graphics()
                         graphics.store_top5_graphics(compani_top5, compani)
                     elif confirmation == 2:
+                        compani_top5 = compani_top5.to_string(header=False)
                         print(compani_top5)
                 else:
                     print("It can't be a letter")
@@ -137,7 +146,7 @@ class Data():
         top_10 = Com_p.sort_values(by='Price', ascending=False)[:10]
         name_compani = top_10.index
         # Call the repetition function to handle common logic
-        self.repetition(top_10, name_compani, "top_10_company_graphics")
+        self.repetition(top_10, name_compani, "top_10_company_graphics","Companies and their sales 2022-23")
 
     def cars_sold_per_month(self):
         """
@@ -156,7 +165,7 @@ class Data():
         carros_por_mes = df['Date'].value_counts()
         carros_por_mes = carros_por_mes.sort_index(ascending=True)
         # Call the repetition function to handle common logic
-        self.repetition(carros_por_mes, months, "cars_sold_per_month_graphics")
+        self.repetition(carros_por_mes, months, "cars_sold_per_month_graphics","Number of cars sold per month during 2022-223")
 
     def top_10_car(self):
         """
@@ -172,7 +181,7 @@ class Data():
         car_name = car_name.index
         carros_mas_populares = carros_2020_2023['Model'].value_counts().head(10)
         # Call the repetition function to handle common logic
-        self.repetition(carros_mas_populares, car_name, "top_10_car_graphics")
+        self.repetition(carros_mas_populares, car_name, "top_10_car_graphics","Top 10 best-selling cars in 2022-2023")
 
     def growing_companies(self):
         """
@@ -192,17 +201,34 @@ class Data():
         ventas_por_fabricante_y.set_index('Company', inplace=True)
         company_names = ventas_por_fabricante_y.index
         # Call the repetition function to handle common logic
-        self.repetition(ventas_por_fabricante_y, company_names, "growing_companies_graphics")
+        self.repetition(ventas_por_fabricante_y, company_names, "growing_companies_graphics","Companies and their growth (%) in 2022-23")
 
-    def repetition(self, data_informacion, data_name, funcion_name):
+    def prferencia_modelo(self):
+        df = self.clean_data()
+        df = df.groupby(['Model', 'Gender']).size().unstack()
+        name_index = df.index
+        self.repetition(df, name_index, "prferencia_modelo_graphics","Preferencia de de modelo por genero in 2022-23")
+        #plt.figure(figsize=(12, 8))
+        #plt.title('Preferencias de modelos a lo largo de los años')
+        #plt.show()
+    def transmission_type(self):
+        df = self.clean_data()
+        segmento_transmision = df['Transmission'].value_counts()
+        porcentaje_transmision = (segmento_transmision / segmento_transmision.sum()) * 100
+        name = porcentaje_transmision.index
+        df_data = porcentaje_transmision.reset_index()
+        df_data = df_data.set_index('Transmission')
+        self.repetition(df_data, name, "transmission_type_graphics","Transmission type in %")
+    def repetition(self, data_informacion, data_name, funcion_name,menu_title):
         """
         Method to handle repeated logic for displaying data and graphs.
         """
-        print("Select the store:")
+        print(f"{menu_title}:".title())
         for index, name in enumerate(data_informacion.index, start=1):
             print(f"{index}: {name}")
         # Prompt the user to choose a data point or all data points
-        answer = input(f"{len(data_informacion) + 1}: all the stores\n")
+        print(f"{len(data_informacion) + 1}: Select all menu items")
+        answer = input("Select one of the options: \n")
         if answer.isdigit():
             answer = int(answer)
             # If a specific data point is chosen
@@ -220,7 +246,8 @@ class Data():
                         function = graphics.get_funcion_by_name(funcion_name)
                         function(selected_df, data_name)
                     elif confirmation == 2:
-                        print(selected_df)
+                         selected_df = selected_df.to_string(header=False, index=False)
+                         print(selected_df)
                 else:
                     print("It can't be a letter")
             # If all data points are chosen
@@ -248,6 +275,3 @@ class Data():
                        "2: No\n"
                        )
         return answer
-
-#a = Data()
-#a.growing_companies()
